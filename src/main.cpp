@@ -621,47 +621,44 @@ void setup()
 {
   Serial.begin(57600);
   delay(3000);
-  error = ps2x.config_gamepad(13, 3, 12, 8, true, true); //GamePad(clock, command, attention, data, Pressures?, Rumble?)
-  // error = ps2x.config_gamepad(22, 23, 24, 25, true, true); //GamePad(clock, command, attention, data, Pressures?, Rumble?)
+  // error = ps2x.config_gamepad(13, 3, 12, 8, true, true); //GamePad(clock, command, attention, data, Pressures?, Rumble?)
+  error = ps2x.config_gamepad(22, 23, 24, 25, true, true); //GamePad(clock, command, attention, data, Pressures?, Rumble?)
   Serial.println(error);
-  servoBase.attach(5);  // attaches the servo on pin 5 to the servo object
-  servo01.attach(6);    // Pin 6
-  servo02.attach(9);    // Pin 9
-  servoHead.attach(10); // Pin 10
-  servoDoor.attach(11); // Pin 11
-  // servoBase.attach(7); // attaches the servo on pin 5 to the servo object
-  // servo01.attach(6);   // Pin 6
-  // servo02.attach(5);   // Pin 5
-  // servoHead.attach(4); // Pin 4
-  // servoDoor.attach(8); // Pin 11
+  // servoBase.attach(5);  // attaches the servo on pin 5 to the servo object
+  // servo01.attach(6);    // Pin 6
+  // servo02.attach(9);    // Pin 9
+  // servoHead.attach(10); // Pin 10
+  // servoDoor.attach(11); // Pin 11
+  servoBase.attach(7); // attaches the servo on pin 5 to the servo object
+  servo01.attach(6);   // Pin 6
+  servo02.attach(5);   // Pin 5
+  servoHead.attach(4); // Pin 4
+  servoDoor.attach(8); // Pin 11
   int servoHeadValue = EEPROM.read(servoHeadAddress);
   int servo01Value = EEPROM.read(servo01Address);
   int servo02Value = EEPROM.read(servo02Address);
   int servoDoorValue = EEPROM.read(servoDoorAddress);
   int servoBaseValue = EEPROM.read(servoBaseAddress);
-  // servoDoor.write(servoDoorValue);
-  // servoBase.write(servoBaseValue);
-  // servo01.write(servo01Value);
-  // servo02.write(servo02Value);
-  // servoHead.write(servoHeadValue);
+  servoDoor.write(servoDoorValue);
+  servoBase.write(servoBaseValue);
+  servo01.write(servo01Value);
+  servo02.write(servo02Value);
+  servoHead.write(servoHeadValue);
   // Motors Driver
   pinMode(MotorDir_L, OUTPUT);
   pinMode(MotorSpeed_L, OUTPUT);
   pinMode(MotorDir_R, OUTPUT);
   pinMode(MotorSpeed_R, OUTPUT);
   // Relay lights
-  // pinMode(ledgreen, OUTPUT);
-  // digitalWrite(ledgreen, LOW);
-  // pinMode(ledred, OUTPUT);
-  // digitalWrite(ledred, LOW);
-  // pinMode(ledwhite, OUTPUT);
-  // digitalWrite(ledwhite, LOW);
+  pinMode(ledgreen, OUTPUT);
+  digitalWrite(ledgreen, LOW);
+  pinMode(ledred, OUTPUT);
+  digitalWrite(ledred, LOW);
+  pinMode(ledwhite, OUTPUT);
+  digitalWrite(ledwhite, LOW);
 
   //OLED Screen
   display.begin(SSD1306_SWITCHCAPVCC, 0x3c); //or 0x3C
-  // display.clearDisplay();                          //for Clearing the display
-  // display.drawBitmap(0, 0, think[0], 36, 36, WHITE); // display.drawBitmap(x position, y position, bitmap data, bitmap width, bitmap height, color)
-  // display.display();
   display.clearDisplay(); //for Clearing the display
   display.display();
   display.setRotation(2); // ROTATE THE DISPLAY UPSIDE DOWN
@@ -760,11 +757,6 @@ void position01()
   else
   {
     Serial.println("Finished 1");
-    if (ps2x.Button(PSB_RED))
-    {
-      EEPROM.update(headState, 1);
-    }
-    posStart = 0;
   }
 }
 
@@ -808,11 +800,6 @@ void position02()
   else
   {
     Serial.println("Finished 2");
-    if (ps2x.Button(PSB_GREEN))
-    {
-      EEPROM.update(headState, 2);
-    }
-    posStart = 0;
   }
 }
 
@@ -913,9 +900,9 @@ void position03()
       Serial.println(targetPos);
       moveServoDirect(servo02, servo02Address, targetPos);
     }
-    else if (ps2x.ButtonPressed(PSB_BLUE) && ps2x.Button(PSB_R2))
+    else if (ps2x.ButtonPressed(PSB_START) && ps2x.Button(PSB_R2))
     {
-      Serial.println("pressed circle");
+      Serial.println("pressed start");
       circlePressed = true;
       circlePressedTime = millis();
     }
@@ -925,54 +912,38 @@ void position03()
   {
     initalServoBase = EEPROM.read(servoBaseAddress);
   }
-  // else if (millis() < circlePressedTime + 6 * a)
-  // {
-  //   // after robot has looked around, move back to position 2
-  //   moveServo(servoBase, servoBaseAddress, EEPROM.read(servoBaseAddress), initalServoBase, 90);
-  //   moveServo(servo01, servo01Address, EEPROM.read(servo01Address), initalServo01, 138);
-  //   moveServo(servo02, servo02Address, EEPROM.read(servo02Address), initalServo02, 160);
-  //   moveServo(servoHead, servoHeadAddress, EEPROM.read(servoHeadAddress), initalServoHead, 90);
-  // }
   else
   {
     Serial.println("Finished 3");
-    if (ps2x.Button(PSB_RED))
-    {
-      EEPROM.update(headState, 1);
-    }
-    posStart = 0;
   }
 }
 
 void moveHead()
 {
-  byte value = EEPROM.read(headState);
-  if (ps2x.Button(PSB_R2) && ps2x.Button(PSB_R1) && ps2x.Button(PSB_L2) && ps2x.Button(PSB_L1) && ps2x.ButtonPressed(PSB_BLUE))
+  if (ps2x.Button(PSB_R2))
   {
-    buttonPressed = true;
-    if (posStart == 0)
+    if (ps2x.Button(PSB_GREEN))
     {
-      posStart = millis();
-      initalServoDoor = EEPROM.read(servoDoorAddress);
+      posStart = 0;
+      EEPROM.update(headState, 2);
+    }
+    else if (ps2x.Button(PSB_RED))
+    {
+      posStart = 0;
+      EEPROM.update(headState, 1);
+    }
+    else if (ps2x.Button(PSB_BLUE))
+    {
+      posStart = 0;
+      EEPROM.update(headState, 0);
+    }
+    if (ps2x.Button(PSB_PINK))
+    {
+      // Open door
+      moveServoDirect(servoDoor, servoDoorAddress, 56);
     }
   }
-  if (buttonPressed && millis() < posStart + 3 * a)
-  {
-    // Open door
-    moveServo(servoDoor, servoDoorAddress, EEPROM.read(servoDoorAddress), initalServoDoor, 56);
-  }
-  if (buttonPressed && millis() > posStart + 2 * a)
-  {
-    // start the sequence
-    EEPROM.update(headState, 0);
-    posStart = 0;
-    buttonPressed = false;
-  }
-  if (ps2x.Button(PSB_PINK)){
-    // Open door
-    moveServoDirect(servoDoor, servoDoorAddress, 56);
-    
-  }
+  byte value = EEPROM.read(headState);
   if (value == 0)
   {
     position01();
@@ -1238,7 +1209,7 @@ void loop()
     lastReadGamepad = current;
   }
   moveHead();
-  // moveTraction();
-  // controlLights();
+  moveTraction();
+  controlLights();
   controlAnimation();
 }
