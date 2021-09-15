@@ -658,9 +658,14 @@ void setup()
   digitalWrite(ledwhite, LOW);
 
   //OLED Screen
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3c); //or 0x3C
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
+    Serial.println("SSD1306 allocation failed");
+  }
   display.clearDisplay(); //for Clearing the display
+  // display.drawBitmap(0, posy, think[0], 36, 36, WHITE);
   display.display();
+
+  // display.display();
   display.setRotation(2); // ROTATE THE DISPLAY UPSIDE DOWN
 }
 
@@ -906,7 +911,7 @@ void position03()
       circlePressed = true;
       circlePressedTime = millis();
     }
-    delay(10);
+    // delay(10);
   }
   else if (millis() < circlePressedTime + 50)
   {
@@ -1027,7 +1032,8 @@ void controlLights()
     }
   }
 }
-
+int posx =46;
+int posy =14;
 void drawAnimation()
 {
   unsigned long diff = millis() - animationStartTime;
@@ -1043,7 +1049,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, think[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, think[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1053,7 +1059,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, look[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, look[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1063,7 +1069,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, scan[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, scan[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1073,7 +1079,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, recon[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, recon[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1083,7 +1089,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, oxygen[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, oxygen[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1093,7 +1099,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, heart[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, heart[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1103,7 +1109,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, blink[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, blink[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1113,7 +1119,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, battery[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, battery[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1123,7 +1129,7 @@ void drawAnimation()
     if (prevInnerAnimationState != innerAnimationState)
     {
       display.clearDisplay(); //for Clearing the display
-      display.drawBitmap(0, 0, link[innerAnimationState], 36, 36, WHITE);
+      display.drawBitmap(posx, posy, link[innerAnimationState], 36, 36, WHITE);
       display.display();
       prevInnerAnimationState = innerAnimationState;
     }
@@ -1143,11 +1149,9 @@ void controlAnimation()
 {
   if (ps2x.Button(PSB_L2))
   {
-    Serial.println("Pressing L2");
     if (ps2x.Button(PSB_PAD_UP))
     {
       innerAnimationState = 0;
-      Serial.println("Pressed up");
       animationState = 1;
       animationStartTime = millis();
     }
